@@ -1,17 +1,8 @@
-import * as fs from "fs";
-import * as readline from "readline";
-
-function reverseString(str: string) {
-  return str.split("").reverse().join("");
-}
+import { reverseString } from "../utils/string";
+import { createInputStream } from "../utils/file";
 
 (async function () {
-  const fileStream = fs.createReadStream("./day1/input.txt");
-
-  const rl = readline.createInterface({
-    input: fileStream,
-    crlfDelay: Infinity,
-  });
+  const rl = createInputStream("day1");
 
   const numberWords: Record<string, string> = {
     one: "1",
