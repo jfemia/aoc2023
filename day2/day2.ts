@@ -6,9 +6,13 @@ type Sample = {
   blue: number;
 };
 
+function emptySample(): Sample {
+  return { red: 0, green: 0, blue: 0 };
+}
+
 function parseSample(sample: string): Sample {
   const colours = sample.matchAll(/(\d+)\s(\w+)/g);
-  const result = { red: 0, green: 0, blue: 0 };
+  const result = emptySample();
 
   for (const col of colours) {
     result[col[2]] = parseInt(col[1]);
@@ -38,17 +42,36 @@ function checkIfGameIsPossible(game: string): [boolean, number | undefined] {
   return [false, undefined];
 }
 
+function calculateGameMaxPower(game: string): number {
+  const maxSample = game
+    .match(/^.*:(.*)$/)[1]
+    .split(";")
+    .map(parseSample)
+    .reduce((result, sample) => {
+      result.red = Math.max(result.red, sample.red);
+      result.green = Math.max(result.green, sample.green);
+      result.blue = Math.max(result.blue, sample.blue);
+      return result;
+    }, emptySample());
+
+  return Object.values(maxSample).reduce((acc, val) => (acc *= val), 1);
+}
+
 (async function () {
   const rl = createInputStream("day2");
 
-  let sum = 0;
+  let part1Sum = 0;
+  let part2Sum = 0;
 
   for await (const line of rl) {
     const [possible, gameId] = checkIfGameIsPossible(line);
     if (possible) {
-      sum += gameId;
+      part1Sum += gameId;
     }
+
+    part2Sum += calculateGameMaxPower(line);
   }
 
-  console.log("Result:", sum);
+  console.log("Part 1 Result:", part1Sum);
+  console.log("Part 2 Result:", part2Sum);
 })();
